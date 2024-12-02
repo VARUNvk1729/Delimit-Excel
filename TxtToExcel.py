@@ -1,32 +1,43 @@
-import os
-import pandas as pd
 import streamlit as st
-from io import StringIO
+import pandas as pd
+import os
 
-st.title("Fertil Test")
+def process_file(file):
+    content = file.getvalue().decode("utf-8").splitlines()
+    rows = []
+    for line in content:
+        if line.strip():
+            split_parts = line.split("\\")
+            rows.append(split_parts)
+    df = pd.DataFrame(rows)
+    last_files = []
+    for row in rows:
+        last_file = ""
+        for value in row:
+            if '.' in value:
+                last_file = value
+        last_files.append(last_file)
+    df.insert(0, 'Last File', last_files)
+    return df
 
-uploaded_file = st.file_uploader("Upload file below", type="txt")
+def save_to_excel(df):
+    excel_path = "output.xlsx"
+    df.to_excel(excel_path, index=False, header=False, engine='openpyxl')
+    return excel_path
+
+st.title("File Path Splitter and Extractor")
+uploaded_file = st.file_uploader("Upload a .txt file", type=["txt"])
 
 if uploaded_file is not None:
-    content = StringIO(uploaded_file.getvalue().decode("utf-8")).read()
-    paths = content.strip().split('\n')
-
-    split_data = [path.strip().split(os.sep) for path in paths]
-    max_parts = max(len(parts) for parts in split_data)
-    for parts in split_data:
-        parts.extend([''] * (max_parts - len(parts)))
-    dataframe = pd.DataFrame(split_data)
-
-    st.write("Preview")
-    st.dataframe(dataframe)
-
-    output_file = "split_file_paths.xlsx"
-    dataframe.to_excel(output_file, index=False, header=False)
-
-    with open(output_file, "rb") as file:
+    df = process_file(uploaded_file)
+    st.write("Processed DataFrame:")
+    df = df.applymap(str)  # Convert all data to string type to avoid mixed type warning
+    st.dataframe(df)
+    excel_file_path = save_to_excel(df)
+    with open(excel_file_path, "rb") as f:
         st.download_button(
             label="Download Excel File",
-            data=file,
-            file_name="split_file_paths.xlsx",
+            data=f,
+            file_name="output.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
