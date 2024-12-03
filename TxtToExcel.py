@@ -1,40 +1,53 @@
 import streamlit as st
 import pandas as pd
-import os
 
-def process_file(file):
-    content = file.getvalue().decode("utf-8").splitlines()
-    rows = []
-    for line in content:
-        if line.strip():
-            split_parts = line.split("\\")
-            rows.append(split_parts)
-    df = pd.DataFrame(rows)
-    last_files = []
-    for row in rows:
-        last_file = ""
-        for value in row:
-            if '.' in value:
-                last_file = value
-        last_files.append(last_file)
-    df.insert(0, 'Last File', last_files)
+def p(f):
+    c = f.getvalue().decode("utf-8").splitlines()
+    pths = []
+    for l in c:
+        if l.strip():
+            pths.append(l.strip())
+    
+    m = 0
+    sp = []
+    for p in pths:
+        s = p.split("\\")
+        sp.append(s)
+        m = max(m, len(s))
+
+    h = ["Drive"] + [f"Folder Level {i}" for i in range(m - 1)] + ["File Name"]
+    
+    d = []
+    for p in sp:
+        r = [""] * m
+        for i, part in enumerate(p):
+            if "." not in part:
+                r[i] = part
+        fn = p[-1] if "." in p[-1] else ""
+        r.append(fn)
+        d.append(r)
+    
+    df = pd.DataFrame(d, columns=h)
+    df = df[df.iloc[:, 1:].apply(lambda row: row.str.strip().any(), axis=1)]
+    df = df.loc[:, (df != "").any(axis=0)]
+
     return df
 
-def save_to_excel(df):
-    excel_path = "output.xlsx"
-    df.to_excel(excel_path, index=False, header=False, engine='openpyxl')
-    return excel_path
+def s(df):
+    p = "output.xlsx"
+    df.to_excel(p, index=False, engine='openpyxl')
+    return p
 
-st.title("File Path Splitter and Extractor")
-uploaded_file = st.file_uploader("Upload a .txt file", type=["txt"])
+st.title("FERTIL TASK TEST")
+uf = st.file_uploader("Upload a .txt file", type=["txt"])
 
-if uploaded_file is not None:
-    df = process_file(uploaded_file)
+if uf is not None:
+    df = p(uf)
     st.write("Processed DataFrame:")
-    df = df.applymap(str)  # Convert all data to string type to avoid mixed type warning
+    df = df.applymap(str)
     st.dataframe(df)
-    excel_file_path = save_to_excel(df)
-    with open(excel_file_path, "rb") as f:
+    fp = s(df)
+    with open(fp, "rb") as f:
         st.download_button(
             label="Download Excel File",
             data=f,
