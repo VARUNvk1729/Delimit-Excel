@@ -57,6 +57,7 @@
 
 
 #VERSION -2 AFTER CHANGES
+
 import streamlit as st
 import pandas as pd
 import re
@@ -104,50 +105,48 @@ st.markdown("""
     .stTitle {
         font-size: 2.5rem !important;
         padding-bottom: 2rem;
-        color: #4a90e2;
-    }
-    .header-container {
-        background-color: #f0f2f6;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        margin-bottom: 1rem;
-        border: 1px solid #ddd;
     }
     .section-divider {
         margin: 2rem 0;
         text-align: center;
+        border-top: 3px solid #5e81ac;
     }
-    .stButton>button {
-        background-color: #4CAF50;
-        color: white;
-        border-radius: 8px;
-        padding: 10px 20px;
-        border: none;
+    .header-container {
+        background-color: #e9eff5;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-    .stButton>button:hover {
-        background-color: #45a049;
-    }
-    .stFileUploader>label {
-        background-color: #4CAF50;
-        color: white;
-        padding: 10px;
-        border-radius: 8px;
-    }
-    .stFileUploader>label:hover {
-        background-color: #45a049;
+    .header-container h2 {
+        color: #5e81ac;
+        font-weight: bold;
     }
     .stDataFrame {
-        background-color: #f9f9f9;
-        border-radius: 8px;
-        padding: 10px;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        background-color: #f9fafb;
     }
-    .stMarkdown {
-        color: #333;
+    .stButton>button {
+        background-color: #88c0d0;
+        color: white;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+    .stButton>button:hover {
+        background-color: #5e81ac;
+    }
+    .stFileUploader {
+        background-color: #f0f4f8;
+        border-radius: 0.5rem;
+        padding: 1rem;
     }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h1 style='text-align: center; color: #4a90e2;'>FERTIL TASK TEST</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>FERTIL TASK TEST</h1>", unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 
@@ -160,7 +159,7 @@ with col1:
     if uf1 is not None:
         with st.spinner('Processing full data...'):
             df_full = p(uf1)
-            st.success('Full data processed successfully!', icon="✅")
+            st.success('Full data processed successfully!')
             st.write("Processed DataFrame (Full Data):")
             df_full = df_full.applymap(str)
             st.dataframe(df_full, use_container_width=True)
@@ -174,7 +173,7 @@ with col1:
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
 
-st.markdown("<div class='section-divider'><hr style='border: 1px solid #ddd;'></div>", unsafe_allow_html=True)
+st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
 
 with col2:
     st.markdown("<div class='header-container'>", unsafe_allow_html=True)
@@ -194,7 +193,7 @@ with col2:
             new_cols.append("File Name")
             df_filtered.columns = new_cols
             
-            st.success('Filtered data processed successfully!', icon="✅")
+            st.success('Filtered data processed successfully!')
             st.write("Processed DataFrame (Filtered Data):")
             df_filtered = df_filtered.applymap(str)
             st.dataframe(df_filtered, use_container_width=True)
