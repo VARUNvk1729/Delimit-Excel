@@ -63,7 +63,7 @@ import pandas as pd
 import re
 
 def p(f):
-    c = f.getvalue().decode("utf-8").splitlines()
+    c = f.getvalue().decode("utf-16").splitlines()
     pths = [l.strip() for l in c if l.strip()]
     m = 0
     sp = [p.split("\\") for p in pths]
